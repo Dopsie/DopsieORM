@@ -1,4 +1,6 @@
 package Core.ORM;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * RelationalModel
@@ -21,7 +23,7 @@ public class RelationalModel {
     public static DataBaseCollection retreiveByField(String modelName, String fieldName, Object value) {
         try {
             Class ModelClass = Class.forName("Models." + modelName);
-            
+
         } catch (ClassNotFoundException e) {
 
         }
@@ -31,7 +33,7 @@ public class RelationalModel {
     public static DataBaseCollection retreiveByPk(String modelName, Object pk) {
         try {
             Class ModelClass = Class.forName("Models." + modelName);
-            
+
         } catch (ClassNotFoundException e) {
 
         }
@@ -41,15 +43,22 @@ public class RelationalModel {
     public static void deleteByPk(String modelName, Object pk) {
         try {
             Class ModelClass = Class.forName("Models." + modelName);
-            
+
         } catch (ClassNotFoundException e) {
 
         }
-    }   
-    public static void sql(String query) {
-        
     }
 
+    public static Object sql(String query) {
+        Object result = null;
+        try {
+            Connection cnx = DataBaseManager.getInstance().getConnection();
+            result = cnx.createStatement().executeQuery(query);
+        } catch (SQLException e) {
+            System.out.println("Error Executing query");
+        }
+        return result;
+    }
 
     public DataBaseCollection update() {
 
