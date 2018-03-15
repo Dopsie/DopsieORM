@@ -40,13 +40,12 @@ public class Model extends RelationalModel {
     }
 
     public static Model fetch(String className) throws ModelException {
-        Class ModelClass = null;
         try {
-            ModelClass = Class.forName("Models." + className);
+            Class ModelClass = Class.forName("Models." + className);
+            return Model.class.cast(ModelClass.newInstance());
         } catch (Exception e) {
-            System.out.println(e.toString());
+            throw new ModelException("couldn't make Model");
         }
-        return Model.class.cast(ModelClass.newInstance());
     }
 
     public Model all() {
