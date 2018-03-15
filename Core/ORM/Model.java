@@ -29,7 +29,7 @@ public class Model extends RelationalModel {
             System.out.println(var.getName());
             System.out.println(var.getType());
         }
-        return null ;
+        return null;
     }
 
     public Model where(String arg1, String operator, String arg2) {
@@ -38,8 +38,7 @@ public class Model extends RelationalModel {
         return this;
     }
 
-    public static Model fetch(String className)
-            throws InstantiationException, IllegalAccessException, InvocationTargetException {
+    public static Model fetch(String className) throws ModelException {
         Class ModelClass = null;
         try {
             ModelClass = Class.forName("Models." + className);
