@@ -1,0 +1,7 @@
+/**
+ * DataBaseManager
+ */
+public class DataBaseManager {
+
+    
+}
