@@ -9,8 +9,7 @@ import java.lang.reflect.*;
 public class Model {
 
     private ArrayList<ArrayList<String>> conditionStack;
-    protected String tableName = "";
-
+    
     public Model() {
         conditionStack = new ArrayList<ArrayList<String>>();
     }
@@ -21,15 +20,14 @@ public class Model {
         return this;
     }
 
-    public static Model fetch(String className) throws InstantiationException, IllegalAccessException, InvocationTargetException {
-        Class clazz = null;
+    public static Model fetch(String className) throws ModelException{
         try {
-            clazz = Class.forName(className);
+            Class clazz = Class.forName(className);
+            return Model.class.cast(clazz.newInstance());
         }
         catch(Exception e) {
-            System.out.println(" Error Creating Model ");
+            throw new ModelException("Couldn't create Model");
         }
-        return Model.class.cast(clazz.newInstance());
     }
 
     public Model all() {
@@ -43,11 +41,5 @@ public class Model {
 
     public String getTableName() {
         return this.getClass().getSimpleName();
-    }
-}
-
-class CurrentClassGetter extends SecurityManager {
-    public String getClassName() {
-        return getClassContext()[1].getName();
     }
 }
