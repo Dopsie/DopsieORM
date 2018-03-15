@@ -1,0 +1,7 @@
+
+Compiling with terminal : 
+    - find . -type f -name "*.java" -print | xargs javac
+Executing test file : 
+    - java -cp .:/path/to/jar/Driver Test 
+
+Config/Defines.java Contain database connection informations.

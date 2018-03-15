@@ -1,0 +1,1 @@
+$(shell find . -type f -name "*.java" -print | xargs javac )
