@@ -1,6 +1,8 @@
 package Core.ORM;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * RelationalModel
@@ -75,5 +77,41 @@ public class RelationalModel {
             this.isNew = false;
         } else
             this.update();
+    }
+
+    protected ArrayList<Model> hasMany(Class clazz) throws ModelException{
+        try {
+            return new ArrayList<Model>(Arrays.asList(Model.class.cast(clazz.newInstance()), 
+                                                            Model.class.cast(clazz.newInstance()), 
+                                                            Model.class.cast(clazz.newInstance())));
+        } catch(Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected Model hasOne(Class clazz) throws ModelException{
+        try {
+            return Model.class.cast(clazz.newInstance());
+        } catch(Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected Model belongsTo(Class clazz) throws ModelException{
+        try {
+            return Model.class.cast(clazz.newInstance());
+        } catch(Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected ArrayList<Model> belongsToMany(Class clazz) throws ModelException{
+        try {
+            return new ArrayList<Model>(Arrays.asList(Model.class.cast(clazz.newInstance()), 
+                                                                Model.class.cast(clazz.newInstance()), 
+                                                                Model.class.cast(clazz.newInstance())));
+        } catch(Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
     }
 }
