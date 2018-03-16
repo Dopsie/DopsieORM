@@ -1,7 +1,9 @@
 package Models;
 
 import Core.ORM.*;
-
+import Helpers.Exceptions.*;
+import Helpers.Exceptions.ModelException;
+import java.util.ArrayList;
 /**
  * Test
  */
@@ -11,6 +13,14 @@ public class User extends Model {
 
     @Override
     public String getTableName() {
-        return "not a user";
+        return "personne";
+    }
+
+    public ArrayList<Model> posts() throws ModelException{
+        try {
+            return this.hasMany(Post.class);
+        } catch (Exception e) {
+            throw new ModelException("Could not find relationship");
+        }
     }
 }

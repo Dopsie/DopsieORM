@@ -52,6 +52,16 @@ public class Model extends RelationalModel {
         return this;
     }
 
+    public Model find (int id) throws ModelException {
+        try {
+            Class clazz = this.getClass();
+            return Model.class.cast(clazz.newInstance());
+        }
+        catch(Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+    
     public void execute() {
         System.out.println("table = " + this.getTableName());
         this.conditionStack.stream().forEach(System.out::println);
