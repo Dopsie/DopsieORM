@@ -39,29 +39,26 @@ public class Model extends RelationalModel {
         return this;
     }
 
-    public static Model fetch(String className) throws ModelException {
+    public static <T> T fetch(Class<T> theClass) throws ModelException {
         try {
-            Class ModelClass = Class.forName("Models." + className);
-            return Model.class.cast(ModelClass.newInstance());
+            return theClass.cast(theClass.newInstance());
         } catch (Exception e) {
-            throw new ModelException("couldn't make Model");
-        }
+            throw new ModelException("Couldn't create Model");
+        }       
     }
 
     public Model all() {
         return this;
     }
 
-    public Model find (int id) throws ModelException {
+    public static <T> T find(Class<T> theClass, int id) throws ModelException {
         try {
-            Class clazz = this.getClass();
-            return Model.class.cast(clazz.newInstance());
-        }
-        catch(Exception e) {
+            return theClass.cast(theClass.newInstance());
+        } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
     }
-    
+
     public void execute() {
         System.out.println("table = " + this.getTableName());
         this.conditionStack.stream().forEach(System.out::println);
