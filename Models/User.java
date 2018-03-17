@@ -16,7 +16,7 @@ public class User extends Model {
         return "personne";
     }
 
-    public ArrayList<Model> posts() throws ModelException{
+    public ArrayList<Post> posts() throws ModelException{
         try {
             return this.hasMany(Post.class);
         } catch (Exception e) {
