@@ -3,6 +3,7 @@ package Core.ORM;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.lang.Class;
 import java.lang.reflect.*;
 import Helpers.Exceptions.*;
@@ -77,9 +78,27 @@ public class Model extends RelationalModel {
         return this.getClass().getSimpleName();
     }
 
-    public DataBaseCollection update() {
-
-        return null;
+    public void update() {    
+        try {
+            String columnsNames = String.join(",", this.attributes.keySet());
+            ArrayList<String> args = new ArrayList<String>();
+            for (Map.Entry<String, Object> attr : this.attributes.entrySet()) {
+                args.add(" " + attr.getKey() + " = ?");
+            }
+            String queryString = "UPDATE " + 
+                                this.getTableName() + 
+                                " SET " + 
+                                String.join(",", args) + 
+                                " WHERE " + 
+                                this.primaryKey + 
+                                " = " + 
+                                this.getAttr( this.primaryKey);
+            System.out.println(queryString);
+            this.attributes.values().forEach(System.out::println);
+            RelationalModel.sqlUpdate(queryString, new ArrayList(this.attributes.values()));
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
     };
 
     public void insert() {

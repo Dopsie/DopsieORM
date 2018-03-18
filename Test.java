@@ -13,11 +13,16 @@ public class Test {
         try {
             // Model.fetch(User.class).all().where("hey", "hi", "arg2").where("arg1", "operator", "arg2").execute();
             User user =  new User();
+            // user.setAttr("nom", "Kallel");
+            // user.setAttr("prenom", "Wassim");
+            // user.setAttr("creation_date", new Core.DataTypes.Date());
+            // user.save();
+            user.setAttr("Id", 8);
+            user.setAttr("prenom", "mech Wassim");
             user.setAttr("nom", "Kallel");
-            user.setAttr("prenom", "Wassim");
             user.setAttr("creation_date", new Core.DataTypes.Date());
-            user.save();
-            // System.out.println(user.getAllAttributes());
+            System.out.println(user.getAllAttributes());
+            user.update();
             // ResultSet data = (ResultSet)Model.sqlQuery("Select * From personne where prenom = ?" ,
             //                                             Arrays.asList("xxxxx"));
             // while (data.next()) {
