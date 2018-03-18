@@ -4,7 +4,11 @@ package Core.DataTypes;
  * Date
  */
 public class Date extends java.sql.Date{
-    Date(long date) {
+    public Date(long date) {
         super(date);
+    }
+
+    public Date() {
+        super((new java.util.Date()).getTime());
     }
 }
