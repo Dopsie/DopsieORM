@@ -17,6 +17,7 @@ public class RelationalModel {
     public static String tableName = "";
     protected String primaryKey = "Id";
     protected boolean isNew = false;
+    protected Boolean isModified = false;
 
     public RelationalModel(String primaryKey) {
         this.primaryKey = primaryKey;
@@ -32,7 +33,7 @@ public class RelationalModel {
             Class ModelClass = Class.forName("Models." + modelName);
 
         } catch (ClassNotFoundException e) {
-
+            
         }
         return null;
     }
@@ -52,7 +53,7 @@ public class RelationalModel {
             Class ModelClass = Class.forName("Models." + modelName);
 
         } catch (ClassNotFoundException e) {
-
+    
         }
     }
 
@@ -115,23 +116,7 @@ public class RelationalModel {
     }
 
 
-    public DataBaseCollection update() {
-
-        return null;
-    };
-
-    public void insert() {
-
-    }
-
-    public void save() {
-        if (this.isNew()) {
-            this.insert();
-            this.isNew = false;
-        } else
-            this.update();
-    }
-
+    
     protected <T extends RelationalModel> ArrayList<T> hasMany(Class<T> clazz) throws ModelException {
         try {
             return new ArrayList<T>(Arrays.asList(clazz.cast(clazz.newInstance()), 

@@ -2,6 +2,7 @@ package Core.ORM;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.lang.Class;
 import java.lang.reflect.*;
 import Helpers.Exceptions.*;
@@ -13,24 +14,32 @@ import Models.*;
 public class Model extends RelationalModel {
 
     private ArrayList<ArrayList<String>> conditionStack;
+    private HashMap<String, Object> attributes;
 
     public Model(String primaryKey) {
         super(primaryKey);
         conditionStack = new ArrayList<ArrayList<String>>();
+        attributes = new HashMap<String, Object>();
     }
 
     public Model() {
         super("Id");
         conditionStack = new ArrayList<ArrayList<String>>();
+        attributes = new HashMap<String, Object>();
     }
 
-    public ArrayList<Field> getAttributes() {
-        Field[] fields = getClass().getFields();
-        for (Field var : fields) {
-            System.out.println(var.getName());
-            System.out.println(var.getType());
-        }
-        return null;
+    public HashMap<String, Object> getAllAttributes() {
+        return this.attributes;
+    }
+
+
+    public Object getAttr(String columnName) {
+        return this.attributes.get(columnName);
+    }
+
+    public void setAttr(String columnName, Object value) {
+        this.isModified = true;
+        this.attributes.put(columnName, value);
     }
 
     public Model where(String arg1, String operator, String arg2) {
@@ -67,4 +76,43 @@ public class Model extends RelationalModel {
     public String getTableName() {
         return this.getClass().getSimpleName();
     }
+
+    public DataBaseCollection update() {
+
+        return null;
+    };
+
+    public void insert() {
+        try {
+            String columnsNames = String.join(",", this.attributes.keySet());
+            String[] wildcards = new String[this.attributes.size()];
+            Arrays.fill(wildcards,"?");
+            String wildcardsString = String.join(",", Arrays.asList(wildcards));
+            String queryString = "INSERT INTO " + 
+                                this.getTableName() + 
+                                " (" + 
+                                columnsNames + 
+                                ") VALUES (" +
+                                wildcardsString +
+                                ")";
+            System.out.println(queryString);
+            this.attributes.values().forEach(System.out::println);
+            RelationalModel.sqlUpdate(queryString, new ArrayList(this.attributes.values()));
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+        
+    }
+
+    public void save() {
+        if (this.isNew()) {
+            this.insert();
+            this.isNew = false;
+            
+        } else {
+            this.update();
+        }
+        this.isModified = false;
+    }
+
 }
