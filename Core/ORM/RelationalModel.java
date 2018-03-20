@@ -55,6 +55,10 @@ public class RelationalModel {
         }
     }
 
+    public String getPrimaryKeyName() {
+        return "id";
+    }
+
     private static PreparedStatement setPerparedStatementArgs(PreparedStatement statement, List args) throws SQLException, UnsupportedDataTypeException{
         for(int index = 0; index < args.size(); index++) {
             int pstIndex = index + 1;

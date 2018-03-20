@@ -97,7 +97,7 @@ public class Model extends RelationalModel {
                 args.add(" " + attr.getKey() + " = ?");
             }
             String queryString = "UPDATE " + this.getTableName() + " SET " + String.join(",", args) + " WHERE "
-                    + this.primaryKey + " = " + this.getAttr(this.primaryKey);
+                    + this.getPrimaryKeyName() + " = " + this.getAttr(this.getPrimaryKeyName());
             System.out.println(queryString);
             this.attributes.values().forEach(System.out::println);
             RelationalModel.sqlUpdate(queryString, new ArrayList(this.attributes.values()));
