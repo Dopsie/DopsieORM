@@ -4,9 +4,13 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Arrays;
+import java.util.HashMap;
+
 import Helpers.Exceptions.*;
 
 /**
@@ -53,7 +57,7 @@ public class RelationalModel {
             Class ModelClass = Class.forName("Models." + modelName);
 
         } catch (ClassNotFoundException e) {
-    
+            
         }
     }
 
@@ -100,6 +104,55 @@ public class RelationalModel {
         return result;
     }
 
+    public static <T extends Model> ArrayList<T> sqlQuery(String query, List args, Class<T> model) throws UnsupportedDataTypeException, ModelException {
+        ArrayList<T> result = new ArrayList<T>();
+        try {
+            ResultSet data = sqlQuery(query, args);
+
+            // Getting column count using ResultSetMetaData
+            ResultSetMetaData metaData = data.getMetaData();
+            int columnsCount = metaData.getColumnCount();
+
+            // Create a map with column names and types
+            HashMap<String,String> columns = new HashMap<String,String>();
+            for(int i = 1; i <= columnsCount; i++) {
+                String columnLabel = metaData.getColumnLabel(i);
+                String columnType = metaData.getColumnTypeName(i);
+                columns.put(columnLabel, columnType);
+            }
+
+            // Loop through results
+            while (data.next()) {
+                T object = model.newInstance();
+                // loop through all cells using column details
+                for (Map.Entry cell : columns.entrySet()) {
+                    if(cell.getValue() == "TEXT" || cell.getValue() == "VARCHAR") {
+                        object.setAttr((String)cell.getKey(), data.getString((String)cell.getKey()));
+                    } else if(cell.getValue() == "DATE" || cell.getValue() == "DATETIME") {
+                        object.setAttr((String)cell.getKey(), data.getDate((String)cell.getKey()));
+                    } else if(cell.getValue() == "INT" || 
+                              cell.getValue() == "TINYINT" || 
+                              cell.getValue() == "SMALLINT" ||
+                              cell.getValue() == "MEDIUMINT" ||
+                              cell.getValue() == "BIGINT") {
+                        object.setAttr((String)cell.getKey(), data.getInt((String)cell.getKey()));
+                    } else if(cell.getValue() == "FLOAT") {
+                        object.setAttr((String)cell.getKey(), data.getFloat((String)cell.getKey()));
+                    } else if(cell.getValue() == "DOUBLE") {
+                        object.setAttr((String)cell.getKey(), data.getDouble((String)cell.getKey()));
+                    } else if(cell.getValue() == "TIME") {
+                        object.setAttr((String)cell.getKey(), data.getTime((String)cell.getKey()));
+                    }
+                }
+                result.add(object);
+            }
+        } catch (UnsupportedDataTypeException e) {
+            throw new UnsupportedDataTypeException("UnsupportedDataTypeException");
+        } catch (Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+        return result;
+    }
 
     
     public static int sqlUpdate(String query, List args) throws UnsupportedDataTypeException{
