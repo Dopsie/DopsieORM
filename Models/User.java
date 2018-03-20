@@ -16,6 +16,11 @@ public class User extends Model {
         return "personne";
     }
 
+    @Override
+    public String getPrimaryKeyName() {
+        return "id";
+    }
+
     public ArrayList<Post> posts() throws ModelException{
         try {
             return this.hasMany(Post.class);

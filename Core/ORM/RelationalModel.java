@@ -19,14 +19,8 @@ import Helpers.Exceptions.*;
 public class RelationalModel {
 
     public static String tableName = "";
-    protected String primaryKey = "Id";
     protected boolean isNew = false;
     protected Boolean isModified = false;
-
-    public RelationalModel(String primaryKey) {
-        this.primaryKey = primaryKey;
-        this.isNew = true;
-    }
 
     public boolean isNew() {
         return this.isNew;
@@ -168,41 +162,4 @@ public class RelationalModel {
         return result;
     }
 
-
-    
-    protected <T extends RelationalModel> ArrayList<T> hasMany(Class<T> clazz) throws ModelException {
-        try {
-            return new ArrayList<T>(Arrays.asList(clazz.cast(clazz.newInstance()), 
-                                                  clazz.cast(clazz.newInstance()),
-                                                  clazz.cast(clazz.newInstance())));
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends RelationalModel> T hasOne(Class<T> clazz) throws ModelException {
-        try {
-            return clazz.cast(clazz.newInstance());
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends RelationalModel> T belongsTo(Class<T> clazz) throws ModelException {
-        try {
-            return clazz.cast(clazz.newInstance());
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends RelationalModel> ArrayList<T> belongsToMany(Class<T> clazz) throws ModelException {
-        try {
-            return new ArrayList<T>(Arrays.asList(clazz.cast(clazz.newInstance()), 
-                                                  clazz.cast(clazz.newInstance()),
-                                                  clazz.cast(clazz.newInstance())));
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
 }

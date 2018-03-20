@@ -23,11 +23,20 @@ public class Test {
             // user.setAttr("creation_date", new Core.DataTypes.Date());
             // System.out.println(user.getAllAttributes());
             // user.update();
-            ArrayList<User> data = Model.sqlQuery("Select * From personne where prenom = ?" ,
-                                                        Arrays.asList("wassim"), User.class);
-            for (User tmp : data) {
-                System.out.println(tmp.getAttr("creation_date"));
-            }
+            // ArrayList<User> data = Model.sqlQuery("Select * From personne where prenom = ?" ,
+            //                                             Arrays.asList("wassim"), User.class);
+            // for (User tmp : data) {
+            //     System.out.println(tmp.getAttr("creation_date"));
+            // }
+
+            ArrayList<User> data = Model.fetch(User.class).all().where("prenom", "=", "Wassim").execute();
+
+            // for (User user : data) {
+            //     System.out.println(user);
+            // }
+            System.out.println(Model.find(User.class, 9));
+            
+
             // System.out.println(data);
             // while (data.next()) {
             //     System.out.println(data.getString(2));
