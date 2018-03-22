@@ -18,7 +18,7 @@ public class User extends Model {
 
     @Override
     public String getPrimaryKeyName() {
-        return "id";
+        return "uid";
     }
 
     public ArrayList<Post> posts() throws ModelException{

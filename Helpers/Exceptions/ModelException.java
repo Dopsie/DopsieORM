@@ -1,5 +1,6 @@
 
 package Helpers.Exceptions;
+
 /**
  * ModelException
  */
