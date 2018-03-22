@@ -16,10 +16,10 @@ import java.util.Map;
 public class Model extends RelationalModel {
 
     private ArrayList<ArrayList<String>> conditionStack;
-    protected HashMap<String, Object> attributes;
 
     public Model() {
         super();
+        this.isNew = true;
         conditionStack = new ArrayList<ArrayList<String>>();
         attributes = new HashMap<String, Object>();
     }
@@ -85,55 +85,6 @@ public class Model extends RelationalModel {
         return sqlQuery(query, args, this.getClass());
     }
 
-    public String getTableName() {
-        return this.getClass().getSimpleName();
-    }
-
-    public void update() {
-        try {
-            String columnsNames = String.join(",", this.attributes.keySet());
-            ArrayList<String> args = new ArrayList<String>();
-            for (Map.Entry<String, Object> attr : this.attributes.entrySet()) {
-                args.add(" " + attr.getKey() + " = ?");
-            }
-            String queryString = "UPDATE " + this.getTableName() + " SET " + String.join(",", args) + " WHERE "
-                    + this.getPrimaryKeyName() + " = " + this.getAttr(this.getPrimaryKeyName());
-            System.out.println(queryString);
-            this.attributes.values().forEach(System.out::println);
-            RelationalModel.sqlUpdate(queryString, new ArrayList(this.attributes.values()));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public void insert() {
-        try {
-            String columnsNames = String.join(",", this.attributes.keySet());
-            String[] wildcards = new String[this.attributes.size()];
-            Arrays.fill(wildcards, "?");
-            String wildcardsString = String.join(",", Arrays.asList(wildcards));
-            String queryString = "INSERT INTO " + this.getTableName() + " (" + columnsNames + ") VALUES ("
-                    + wildcardsString + ")";
-            System.out.println(queryString);
-            this.attributes.values().forEach(System.out::println);
-            RelationalModel.sqlUpdate(queryString, new ArrayList(this.attributes.values()));
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
-
-    }
-
-    public void save() {
-        if (this.isNew()) {
-            this.insert();
-            this.isNew = false;
-
-        } else {
-            this.update();
-        }
-        this.isModified = false;
-    }
-
     @Override
     public String toString() {
         String returnedValue = "=============================\n";
@@ -141,73 +92,5 @@ public class Model extends RelationalModel {
             returnedValue += (var.getKey() + " : " + var.getValue() + '\n');
         }
         return returnedValue;
-    }
-
-    protected <T extends Model> ArrayList<T> hasMany(Class<T> clazz, String foreignKey) throws ModelException {
-        try {
-            int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
-            return Model.fetch(clazz).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute();
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> ArrayList<T> hasMany(Class<T> clazz) throws ModelException {
-        try {
-            return hasMany(clazz, this.getClass().getSimpleName() + "_id");
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> T hasOne(Class<T> clazz) throws ModelException {
-        try {
-            return this.hasOne(clazz, clazz.getSimpleName() + "_id");
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> T hasOne(Class<T> clazz, String foreignKey) throws ModelException {
-        try {
-            return Model.find(clazz, (int) this.getAttr(foreignKey));
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> T belongsTo(Class<T> clazz) throws ModelException {
-        try {
-            return belongsTo(clazz, this.getClass().getSimpleName() + "_id");
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> T belongsTo(Class<T> clazz, String foreignKey) throws ModelException {
-        try {
-            int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
-            return clazz.cast(
-                    Model.fetch(clazz).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute().get(0));
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> ArrayList<T> belongsToMany(Class<T> clazz) throws ModelException {
-        try {
-            return belongsToMany(clazz, this.getClass().getSimpleName() + "_id");
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
-    }
-
-    protected <T extends Model> ArrayList<T> belongsToMany(Class<T> clazz, String foreignKey) throws ModelException {
-        try {
-            int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
-            return Model.fetch(clazz).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute();
-        } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
-        }
     }
 }

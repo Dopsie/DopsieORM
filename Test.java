@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.util.*;
 import Core.DataTypes.*;
+
 /**
  * Test
  */
@@ -12,13 +13,13 @@ public class Test {
     public static void main(String[] args) {
         try {
             // Model.fetch(User.class).all().where("hey", "hi", "arg2").where("arg1", "operator", "arg2").execute();
-            // User user =  new User();
-            // // user.setAttr("nom", "Kallel");
-            // // user.setAttr("prenom", "Wassim");
-            // // user.setAttr("creation_date", new Core.DataTypes.Date());
-            // // user.save();
-            // user.setAttr("Id", 8);
+            // User user = new User();
+            // user.setAttr("nom", "Kallel");
+            // user.setAttr("prenom", "Wassim");
+            // user.save();
+            // // user.setAttr("Id", 8);
             // user.setAttr("prenom", "mech Wassim");
+            // user.save();
             // user.setAttr("nom", "Kallel");
             // user.setAttr("creation_date", new Core.DataTypes.Date());
             // System.out.println(user.getAllAttributes());
@@ -30,12 +31,10 @@ public class Test {
             // }
 
             ArrayList<User> data = Model.fetch(User.class).all().where("prenom", "=", "Wassim").execute();
-
             // for (User user : data) {
             //     System.out.println(user);
             // }
             System.out.println(Model.find(User.class, 9));
-            
 
             // System.out.println(data);
             // while (data.next()) {
@@ -45,8 +44,6 @@ public class Test {
             // System.out.println(Model.find(User.class, 2).posts());
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }       
+        }
     }
 }
-
-
