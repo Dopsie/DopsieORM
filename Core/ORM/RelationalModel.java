@@ -8,12 +8,8 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import Core.ORM.Model;
-
 import java.util.Arrays;
 import java.util.HashMap;
-
 import Helpers.Exceptions.*;
 
 /**
@@ -128,7 +124,7 @@ public abstract class RelationalModel {
     }
 
     public String getTableName() {
-        return this.getClass().getSimpleName();
+        return this.getClass().getSimpleName().toLowerCase();
     }
 
     public void save() {
@@ -159,7 +155,7 @@ public abstract class RelationalModel {
 
     protected <T extends Model> ArrayList<T> hasMany(Class<T> theClass) throws ModelException {
         try {
-            return hasMany(theClass, this.getClass().getSimpleName() + "_id");
+            return hasMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
@@ -167,7 +163,7 @@ public abstract class RelationalModel {
 
     protected <T extends Model> T hasOne(Class<T> theClass) throws ModelException {
         try {
-            return this.hasOne(theClass, theClass.getSimpleName() + "_id");
+            return this.hasOne(theClass, theClass.getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
@@ -183,7 +179,7 @@ public abstract class RelationalModel {
 
     protected <T extends Model> T belongsTo(Class<T> theClass) throws ModelException {
         try {
-            return belongsTo(theClass, this.getClass().getSimpleName() + "_id");
+            return belongsTo(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
@@ -201,7 +197,7 @@ public abstract class RelationalModel {
 
     protected <T extends Model> ArrayList<T> belongsToMany(Class<T> theClass) throws ModelException {
         try {
-            return belongsToMany(theClass, this.getClass().getSimpleName() + "_id");
+            return belongsToMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
