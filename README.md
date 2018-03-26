@@ -45,19 +45,19 @@ You are able to apply filters on the data using the `where` method:
 
 ```
 ArrayList<User> allUsersList = Model.fetch(User.class)
-									.all()
-									.where("prenom", "=", "john")
-									.execute();
+				  .all()
+				  .where("prenom", "=", "john")
+				  .execute();
 ```
 
 You are also able to order the data using the `orderBy` method:
 
 ```
 ArrayList<User> allUsersList = Model.fetch(User.class)
-									.all()
-									.where("prenom", "=", "john")
-									.orderBy("prenom", "DESC")
-									.execute();
+				  .all()
+				  .where("prenom", "=", "john")
+				  .orderBy("prenom", "DESC")
+				  .execute();
 ```
 
 You can get an attribute using `getAttr` method:
