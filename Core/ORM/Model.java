@@ -16,6 +16,7 @@ import java.util.Map;
 public class Model extends RelationalModel {
     // ConditionStack containing the list of conditions from the built query.
     private ArrayList<ArrayList<String>> conditionStack;
+    private ArrayList<ArrayList<String>> orderStack;
 
     /**
      * Initializes the newly created Model instance : 
@@ -26,6 +27,7 @@ public class Model extends RelationalModel {
         super();
         this.isNew = true;
         conditionStack = new ArrayList<ArrayList<String>>();
+        orderStack = new ArrayList<ArrayList<String>>();
         attributes = new HashMap<String, Object>();
     }
     /**
@@ -59,11 +61,31 @@ public class Model extends RelationalModel {
      * @param arg1 The name of the column that will be matched
      * @param arg2 The searched value.
      * @param operator The comparaison operator.
-
      */
     public Model where(String arg1, String operator, String arg2) {
         ArrayList<String> condition = new ArrayList<String>(Arrays.asList(arg1, operator, arg2));
         conditionStack.add(condition);
+        return this;
+    }
+
+    /**
+     * Add a where condition to the conditionStack.
+     * @param arg1 The name of the column that will be matched
+     * @param arg2 The searched value.
+     * Operator : default to Equal.
+     */
+    public Model where(String arg1, String arg2) {
+        return this.where(arg1, "=", arg2);
+    }
+
+    /**
+     * Add an orderby to the conditionStack.
+     * @param arg Column name.
+     * @param orderType DESC|ASC
+     */
+    public Model orderBy(String arg, String orderType) {
+        ArrayList<String> orderObject = new ArrayList<String>(Arrays.asList(arg, orderType));
+        this.orderStack.add(orderObject);
         return this;
     }
 
@@ -107,15 +129,24 @@ public class Model extends RelationalModel {
         ArrayList args = new ArrayList();
         String query = "SELECT * FROM " + this.getTableName();
 
-        if (!conditionStack.isEmpty()) {
+        if (!this.conditionStack.isEmpty()) {
             query += " WHERE ";
             ArrayList<String> queryConditions = new ArrayList<String>();
             // Parsing conditions and building the condition part in the sql query
-            for (ArrayList<String> conditionStatment : conditionStack) {
+            for (ArrayList<String> conditionStatment : this.conditionStack) {
                 queryConditions.add(conditionStatment.get(0) + " " + conditionStatment.get(1) + " ? ");
                 args.add(conditionStatment.get(2));
             }
             query += String.join(",", queryConditions);
+        }
+        if (!this.orderStack.isEmpty()) {
+            query += " ORDER BY";
+            ArrayList<String> orderStatments = new ArrayList<String>();
+            // Parsing order statments and building the condition part in the sql query
+            for (ArrayList<String> orderElement : this.orderStack) {
+                orderStatments.add(" " + orderElement.get(0) + " " + orderElement.get(1));
+            }
+            query += String.join(",", orderStatments);
         }
         query += ";";
         return sqlQuery(query, args, this.getClass());
