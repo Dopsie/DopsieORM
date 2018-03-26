@@ -13,7 +13,7 @@ import java.util.HashMap;
 import Helpers.Exceptions.*;
 
 /**
- * RelationalModel
+ * Relational Model
  */
 public abstract class RelationalModel {
 
@@ -34,6 +34,10 @@ public abstract class RelationalModel {
         return "id";
     }
 
+    /**
+     * Delete an entry.
+     * Instance method that deletes an entry by its primaryKey.  
+     */
     public void delete() {
         try {
             String queryStatement = "Delete From " + this.getTableName() + " WHERE " + this.getPrimaryKeyName()
@@ -46,10 +50,21 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Execute an sql query without data binding. 
+     * @param  query the sql query string, to be executed.  
+     * @return      java.sql.ResultSet : the result of the executeQuery function
+     */
     public static ResultSet sqlQuery(String query) throws UnsupportedDataTypeException {
         return sqlQuery(query, new ArrayList<>());
     }
 
+    /**
+     * Execute an sql query with data binding. 
+     * @param  query the sql query string, to be executed.  
+     * @param  args the List of args to be binded with the query before execution.  
+     * @return      java.sql.ResultSet : the result of the executeQuery function
+     */
     public static ResultSet sqlQuery(String query, List args) throws UnsupportedDataTypeException {
         ResultSet result = null;
         try {
@@ -57,13 +72,23 @@ public abstract class RelationalModel {
             PreparedStatement statement = cnx.prepareStatement(query);
             statement = setPerparedStatementArgs(statement, args);
             result = statement.executeQuery();
-
         } catch (SQLException e) {
             System.out.println("Error Executing query");
         }
         return result;
     }
 
+    /**
+     * Execute an sql query with data binding. 
+     * @param  query the sql query string, to be executed.  
+     * @param  args the List of args to be binded with the query before execution.  
+     * @param  model   
+     * @return      ArayList : the result of the execution of the query as a 
+     *              list of instances from the specified model
+     * @exception  ModelException : the returned data after the query exceution
+     *             can be uncompatible with the model passed as parameter. 
+     *              
+     */
     public static <T extends Model> ArrayList<T> sqlQuery(String query, List args, Class<T> model)
             throws UnsupportedDataTypeException, ModelException {
         ArrayList<T> result = new ArrayList<T>();
@@ -96,7 +121,12 @@ public abstract class RelationalModel {
         }
         return result;
     }
-
+    /**
+     * Get the primarykey result of auto-increment or new insert :
+     * @param statemnt: The java.sql.PreparedStatement the query and the 
+     *                  metadata of the last execution.
+     * @return an Object containing the primarykey value if exist else null.
+     */
     public static Object getPrimaryKeyAfterInsert(PreparedStatement statement) throws SQLException {
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
@@ -105,7 +135,16 @@ public abstract class RelationalModel {
         }
         return null;
     }
-
+    
+    /**
+     * Executing an sqlUpdate (insert and update fields in the database)
+     * @param query: the sql query to be executed with specification of the 
+     *               fields that are going to be replaced as question mark (?).
+     * @param args: the list of values that will be binded to the sql query in order
+     *              to be prepared.
+     * @return Long: The value of the primarykey of the updated or newly 
+     *              inserted entry.
+     */
     public static Long sqlUpdate(String query, List args) throws UnsupportedDataTypeException {
 
         Long createdPrimaryKey = null;
@@ -122,11 +161,21 @@ public abstract class RelationalModel {
         }
         return createdPrimaryKey;
     }
-
+    /**
+     * Get the Table Name from Model instance.
+     * Can be overridded in child classes in order to change the table name.
+     * @return String containing the name of the database table. 
+     *          default: return simple class name.
+     */
     public String getTableName() {
         return this.getClass().getSimpleName().toLowerCase();
     }
 
+    /**
+     * Save entity :
+     *      creates an new entry if the instance is newly created and never saved before.
+     *      updates the entry that matches the primarykey of the instance if modified.
+     */
     public void save() {
         if (this.isNew()) {
             Long primaryKey = this.insert();
@@ -138,12 +187,27 @@ public abstract class RelationalModel {
         this.isModified = false;
     }
 
+    /**
+     * Set the primarykey of a newly created instance after save.
+     * newly created instance will have usually an new primarykey
+     * after insertion to database if not specified before.
+     */
     private void setPrimaryKeyAfterInsert(Long primaryKey) {
         if (primaryKey != null) {
             this.setAttr(this.getPrimaryKeyName(), primaryKey);
         }
     }
 
+    /**
+     * Defines a relationship - has many - between Models.
+     * @param theClass: the model in relation with caller 
+     *                  model.( containing the foreignKey)
+     * @param foreignkey: the name of the foreignkey column.
+     * 
+     * @return an array of all instances of a specified Model 
+     *          where the foreignKey of the caller model matches the foreignKey 
+     *          in the requested Model.
+     */
     protected <T extends Model> ArrayList<T> hasMany(Class<T> theClass, String foreignKey) throws ModelException {
         try {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
@@ -153,6 +217,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - has many - between Models.
+     * @param theClass: the model in relation with caller 
+     *                  model.( containing the foreignKey ) 
+     * foreignKey : default to "classname_id" all in lowercase
+     * @return an array of all instances of a specified Model 
+     *          where the foreignKey of the caller model matches the foreignKey in the requested Model.
+     */
     protected <T extends Model> ArrayList<T> hasMany(Class<T> theClass) throws ModelException {
         try {
             return hasMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
@@ -161,6 +233,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - has One - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * foreignKey : default to "classname_id" all in lowercase
+     * @return a unique instance of the specified Model in relation with the 
+     *          caller Model.
+     */
     protected <T extends Model> T hasOne(Class<T> theClass) throws ModelException {
         try {
             return this.hasOne(theClass, theClass.getSimpleName().toLowerCase() + "_id");
@@ -169,6 +249,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - has One - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param foreignkey: the name of the foreignkey column.
+     * @return a unique instance of the specified Model in relation with the 
+     *          caller Model.
+     */
     protected <T extends Model> T hasOne(Class<T> theClass, String foreignKey) throws ModelException {
         try {
             return Model.find(theClass, (int) this.getAttr(foreignKey));
@@ -177,6 +265,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Belongs To - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * ForeignKeyName : default to "classname_id" in lower case.
+     * @return a unique instance of the specified Model in relation with the 
+     *          caller Model.
+     */
     protected <T extends Model> T belongsTo(Class<T> theClass) throws ModelException {
         try {
             return belongsTo(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
@@ -185,6 +281,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Belongs To - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param foreignkey: the name of the foreignkey column.
+     * @return a unique instance of the specified Model in relation with the 
+     *          caller Model.
+     */
     protected <T extends Model> T belongsTo(Class<T> theClass, String foreignKey) throws ModelException {
         try {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
@@ -195,6 +299,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Belongs To Many - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * ForeignKeyName : default to "classname_id" in lower case.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the requested Model.
+     */
     protected <T extends Model> ArrayList<T> belongsToMany(Class<T> theClass) throws ModelException {
         try {
             return belongsToMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
@@ -203,6 +315,14 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Belongs To Many - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param foreignkey: the name of the foreignkey column.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the requested Model.
+     */
     protected <T extends Model> ArrayList<T> belongsToMany(Class<T> theClass, String foreignKey) throws ModelException {
         try {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
@@ -212,6 +332,16 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Mant To Many - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param pivotModel: The model of relationship between the Models
+     * @param foreignKeyFromOtherClass: the foreignKey in the pivot table of the other class of relationship.
+     * @param foreignKeyFromThisClass: the foreignKey of the caller class in the pivot table.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the pivot Model.
+     */
     protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel,
             String foreignKeyFromOtherClass, String foreignKeyFromThisClass) throws ModelException {
         try {
@@ -227,28 +357,56 @@ public abstract class RelationalModel {
         }
     }
 
+    /**
+     * Defines a relationship - Mant To Many - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param pivotModel: The model of relationship between the Models
+     * @param foreignKeyFromOtherClass: the foreignKey in the pivot table of the other class of relationship.
+     * foreignKeyFromThisClass: default to "classname_id" in lowercase.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the pivot Model.
+     */
     protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel,
             String foreignKeyFromOtherClass) throws ModelException {
         try {
-            return manyToMany(theClass, pivotModel,foreignKeyFromOtherClass, this.getClass().getSimpleName().toLowerCase() + "_id");
+            return manyToMany(theClass, pivotModel, foreignKeyFromOtherClass,
+                    this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
             throw new ModelException("Couldn't create Model");
         }
     }
 
+    /**
+     * Defines a relationship - Mant To Many - between Models.
+     * @param theClass: the model in relation with the caller 
+     *                  model.( containing the foreignKey ) 
+     * @param pivotModel: The model of relationship between the Models
+     * foreignKeyFromOtherClass: default to "classname_id" in lowercase.
+     * foreignKeyFromThisClass: default to "classname_id" in lowercase.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the pivot Model.
+     */
     protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel)
             throws ModelException {
         try {
-            return manyToMany(theClass, 
-                              pivotModel, 
-                              theClass.getSimpleName().toLowerCase() + "_id",
-                              this.getClass().getSimpleName().toLowerCase() + "_id");
+            return manyToMany(theClass, pivotModel, theClass.getSimpleName().toLowerCase() + "_id",
+                    this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
 
             throw new ModelException("Couldn't create Model");
         }
     }
 
+    /**
+     * From a Resultset (result of query execution)  and the names of the columns/types 
+     *  populate the fields of Model instance
+     * @param data: the result of a quesry execution 
+     * @param columns: a hashmap containing the names and the types of the columns fetched from database
+     * @param object: the model object that will be populated with data.
+     * @return  ArrayList: an array of all instances of a specified Model where the foreignKey 
+     *          of the caller model matches the foreignKey in the pivot Model.
+     */
     private static <T extends Model> void fillModel(ResultSet data, HashMap<String, String> columns, T object)
             throws SQLException {
         for (Map.Entry cell : columns.entrySet()) {
@@ -270,7 +428,9 @@ public abstract class RelationalModel {
             }
         }
     }
-
+    /**
+     * Update an entry in the database from a new modified instance of a model.
+     */
     private void update() {
         try {
             String columnsNames = String.join(",", this.attributes.keySet());
@@ -286,7 +446,10 @@ public abstract class RelationalModel {
             System.out.println("Error updating model");
         }
     }
-
+    /**
+     * Insert newly created entry in the database from a new instance of a model.
+     * @return The primaryKey of the newly added entry.
+     */
     private Long insert() {
         Long result = null;
         try {
@@ -304,6 +467,13 @@ public abstract class RelationalModel {
         return result;
     }
 
+    /**
+     * Set prepared statement arguments.
+     * @param statement the sql statment that will be prepared and binded with data. 
+     * @param args a list of values that will be binded to the statement.
+     * 
+     * @return The new prepared statement.
+     */
     private static PreparedStatement setPerparedStatementArgs(PreparedStatement statement, List args)
             throws SQLException, UnsupportedDataTypeException {
         for (int index = 0; index < args.size(); index++) {
