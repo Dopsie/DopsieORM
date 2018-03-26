@@ -12,7 +12,7 @@ cp Config/Defines.java.sample Config/Defines.java
 ### Creating a Model
 Create a Model inside `Models`by extending the Model class from Models package:
 
-``` 
+```java
 package Models;
 
 import Core.ORM.*;
@@ -30,52 +30,52 @@ After you will be able to retrieve data as Model from the database:
 
 To retrieve a User by its id :
 
-```
+```java
 User user = Model.find(User.class, 1);
 ```
 
 To retrieve all users:
 
-```
+```java
 ArrayList<User> allUsersList = Model.fetch(User.class).all().execute();
 ```
 
 You are able to apply filters on the data using the `where` method:
 
 
-```
+```java
 ArrayList<User> allUsersList = Model.fetch(User.class)
-				  .all()
-				  .where("prenom", "=", "john")
-				  .execute();
+					.all()
+					.where("prenom", "=", "john")
+					.execute();
 ```
 
 You are also able to order the data using the `orderBy` method:
 
-```
+```java
 ArrayList<User> allUsersList = Model.fetch(User.class)
-				  .all()
-				  .where("prenom", "=", "john")
-				  .orderBy("prenom", "DESC")
-				  .execute();
+					.all()
+					.where("prenom", "=", "john")
+					.orderBy("prenom", "DESC")
+					.execute();
 ```
 
 You can get an attribute using `getAttr` method:
 
-```
-String prenom = user.getAttr("prenom");
+```java
+String lastName = user.getAttr("last_name");
 ```
 
 ### Updating Data
 You can set an attribute in an existing Model object using:
 
-```
-user.setAttr("prenom", "john");
+```java
+user.setAttr("last_name", "john");
 ```
 
 After creating new model object or updating a retrieved object you can push updates to the database using `save`:
 
-```
+```java
 user.save();
 ```
 
@@ -85,7 +85,7 @@ user.save();
 
 #### hasMany
 
-```
+```java
 public class User extends Model {
     public ArrayList<Post> posts() throws ModelException{
         return this.hasMany(Post.class);
@@ -96,7 +96,7 @@ public class User extends Model {
 ## Go Further
 ### Custom table name
 
-```
+```java
 public class User extends Model {
     @Override
     public String getTableName() {
@@ -107,13 +107,13 @@ public class User extends Model {
 ```
 ### Custom Primary Key column name
 
-```
+```java
 public class User extends Model {
     @Override
     public String getPrimaryKeyName() {
         return "user_id";
     }
-
+}
 ```
 
 
@@ -121,19 +121,19 @@ public class User extends Model {
 #### Queries
 You are able to execute SQL queries by calling `sqlQuery` and it will return a `ResultSet`:
 
-```
+```java
 Model.sqlQuery("SELECT * FROM users");
 ```
 
 Or make it into a collection of Model objects by:
 
-```
+```java
 Model.sqlQuery("SELECT * FROM users", User.class);
 ```
 #### Updates
 For Updates you should provide the SQL statment along to arguments:
 
-```
+```java
 ArrayList args = new ArrayList(Arrays.asList("Mike", 1));
 sqlUpdate("UPDATE users SET prenom = ? WHERE id = ?", args)
 ```
