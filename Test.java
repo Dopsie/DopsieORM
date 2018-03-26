@@ -12,11 +12,21 @@ public class Test {
 
     public static void main(String[] args) {
         try {
+            
             // Model.fetch(User.class).all().where("hey", "hi", "arg2").where("arg1", "operator", "arg2").execute();
             // User user = new User();
             // user.setAttr("nom", "Kallel");
             // user.setAttr("prenom", "Wassim");
-            // user.save();
+            // user.setAttr("id", 150);
+            // //user.save();
+            // //System.out.println(user.testHasMany());
+            // Post post = new Post();
+            // post.setAttr("user_id", 150);
+            // post.setAttr("id", 3);
+            // //System.out.println(post.author());
+            // //post.save();
+            // //System.out.println(post.testHasOne());
+            // System.out.println(user.post());
             // // user.setAttr("Id", 8);
             // user.setAttr("prenom", "mech Wassim");
             // user.save();
@@ -35,8 +45,8 @@ public class Test {
             // for (User user : data) {
             //     System.out.println(user);
             // }
-            User u = Model.find(User.class, 9) ;
-            System.out.println(u.testManyToMany());
+            // User u = Model.find(User.class, 9) ;
+            // System.out.println(u.testManyToMany());
             // System.out.println(data);
             // while (data.next()) {
             //     System.out.println(data.getString(2));
