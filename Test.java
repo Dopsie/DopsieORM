@@ -30,12 +30,13 @@ public class Test {
             //     System.out.println(tmp.getAttr("creation_date"));
             // }
 
-            ArrayList<User> data = Model.fetch(User.class).all().where("prenom", "=", "Wassim").execute();
+            //ArrayList<User> data = Model.fetch(User.class).all().where("prenom", "=", "Wassim").execute();
+             
             // for (User user : data) {
             //     System.out.println(user);
             // }
-            System.out.println(Model.find(User.class, 9));
-
+            User u = Model.find(User.class, 9) ;
+            System.out.println(u.testManyToMany());
             // System.out.println(data);
             // while (data.next()) {
             //     System.out.println(data.getString(2));

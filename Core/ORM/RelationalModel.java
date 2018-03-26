@@ -8,6 +8,9 @@ import java.sql.ResultSetMetaData;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import Core.ORM.Model;
+
 import java.util.Arrays;
 import java.util.HashMap;
 
@@ -209,6 +212,43 @@ public abstract class RelationalModel {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
             return Model.fetch(theClass).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute();
         } catch (Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel,
+            String foreignKeyFromOtherClass, String foreignKeyFromThisClass) throws ModelException {
+        try {
+            ArrayList<B> pivotResult;
+            ArrayList<T> result = new ArrayList<T>();
+            pivotResult = this.belongsToMany(pivotModel, foreignKeyFromThisClass);
+            for (B var : pivotResult) {
+                result.add(Model.find(theClass, (int) var.getAttr(foreignKeyFromOtherClass)));
+            }
+            return result;
+        } catch (Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel,
+            String foreignKeyFromOtherClass) throws ModelException {
+        try {
+            return manyToMany(theClass, pivotModel,foreignKeyFromOtherClass, this.getClass().getSimpleName().toLowerCase() + "_id");
+        } catch (Exception e) {
+            throw new ModelException("Couldn't create Model");
+        }
+    }
+
+    protected <B extends Model, T extends Model> ArrayList<T> manyToMany(Class<T> theClass, Class<B> pivotModel)
+            throws ModelException {
+        try {
+            return manyToMany(theClass, 
+                              pivotModel, 
+                              theClass.getSimpleName().toLowerCase() + "_id",
+                              this.getClass().getSimpleName().toLowerCase() + "_id");
+        } catch (Exception e) {
+
             throw new ModelException("Couldn't create Model");
         }
     }
