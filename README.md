@@ -1,7 +1,7 @@
-#DopsieORM
+# DopsieORM
 Lightweight ORM for Java / SQL developers.
 
-##Usage
+## Usage
 
 First, you should define SQL credentials found in the file: 
 
@@ -66,7 +66,7 @@ You can get an attribute using `getAttr` method:
 String prenom = user.getAttr("prenom");
 ```
 
-###Updating Data
+### Updating Data
 You can set an attribute in an existing Model object using:
 
 ```
@@ -80,7 +80,7 @@ user.save();
 ```
 
 
-###Defining Relationships
+### Defining Relationships
 
 
 #### hasMany
@@ -93,8 +93,8 @@ public class User extends Model {
 }
 ```
 
-##Go Further
-###Custom table name
+## Go Further
+### Custom table name
 
 ```
 public class User extends Model {
@@ -105,7 +105,7 @@ public class User extends Model {
 }
 
 ```
-###Custom Primary Key column name
+### Custom Primary Key column name
 
 ```
 public class User extends Model {
@@ -117,8 +117,8 @@ public class User extends Model {
 ```
 
 
-###Executing proper SQL
-####Queries
+### Executing proper SQL
+#### Queries
 You are able to execute SQL queries by calling `sqlQuery` and it will return a `ResultSet`:
 
 ```
@@ -130,7 +130,7 @@ Or make it into a collection of Model objects by:
 ```
 Model.sqlQuery("SELECT * FROM users", User.class);
 ```
-####Updates
+#### Updates
 For Updates you should provide the SQL statment along to arguments:
 
 ```
