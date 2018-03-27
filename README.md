@@ -1,4 +1,5 @@
-# DopsieORM
+<center>![Dopsie](https://i.imgur.com/6BTvfLq.png)</center>
+
 Lightweight ORM for Java / SQL developers.
 
 ## Getting started
