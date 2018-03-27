@@ -1,4 +1,4 @@
-<center>![Dopsie](https://i.imgur.com/6BTvfLq.png)</center>
+![Dopsie](https://i.imgur.com/6BTvfLq.png)
 
 Lightweight ORM for Java / SQL developers.
 
