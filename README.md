@@ -1,13 +1,15 @@
 # DopsieORM
 Lightweight ORM for Java / SQL developers.
 
-## Usage
+## Getting started
 
 First, you should define SQL credentials found in the file: 
 
 ```
 cp Config/Defines.java.sample Config/Defines.java
 ```
+
+## Usage
 
 ### Creating a Model
 Create a Model inside `Models`by extending the Model class from Models package:
@@ -25,7 +27,7 @@ public class User extends Model {
 }
 ```
 
-### Retrieving Data
+### Retrieve Data
 After you will be able to retrieve data as Model from the database:
 
 To retrieve a User by its id :
@@ -46,7 +48,7 @@ You are able to apply filters on the data using the `where` method:
 ```java
 ArrayList<User> allUsersList = Model.fetch(User.class)
 					.all()
-					.where("prenom", "=", "john")
+					.where("last_name", "=", "john")
 					.execute();
 ```
 
@@ -55,8 +57,8 @@ You are also able to order the data using the `orderBy` method:
 ```java
 ArrayList<User> allUsersList = Model.fetch(User.class)
 					.all()
-					.where("prenom", "=", "john")
-					.orderBy("prenom", "DESC")
+					.where("last_name", "=", "john")
+					.orderBy("last_name", "DESC")
 					.execute();
 ```
 
@@ -66,7 +68,7 @@ You can get an attribute using `getAttr` method:
 String lastName = user.getAttr("last_name");
 ```
 
-### Updating Data
+### Update Data
 You can set an attribute in an existing Model object using:
 
 ```java
@@ -78,6 +80,15 @@ After creating new model object or updating a retrieved object you can push upda
 ```java
 user.save();
 ```
+
+
+### Delete Data
+If you want to delete a Model Object you have to trigger the `delete` method:
+
+```java
+user.delete();
+```
+
 
 
 ### Defining Relationships
@@ -92,6 +103,52 @@ public class User extends Model {
     }
 }
 ```
+[More details](https://wassimkallel.github.io/DopsieORM/Core/ORM/RelationalModel.html#hasMany-java.lang.Class-java.lang.String-)
+
+#### hasOne
+
+```java
+public class User extends Model {
+    public Address address() throws ModelException{
+        return this.hasOne(Address.class);
+    }
+}
+```
+
+[More details](https://wassimkallel.github.io/DopsieORM/Core/ORM/RelationalModel.html#hasOne-java.lang.Class-)
+
+#### belongsTo
+
+```java
+public class Post extends Model {
+    public User author() throws ModelException{
+        return this.hasOne(User.class);
+    }
+}
+```
+[More details](https://wassimkallel.github.io/DopsieORM/Core/ORM/RelationalModel.html#belongsTo-java.lang.Class-java.lang.String-)
+
+#### belongsToMany
+```java
+public class User extends Model {
+    public ArrayList<Role> roles() throws ModelException{
+        return this.belongsToMany(Role.class);
+    }
+}
+```
+[More details](https://wassimkallel.github.io/DopsieORM/Core/ORM/RelationalModel.html#belongsToMany-java.lang.Class-java.lang.String-)
+
+#### manyToMany
+
+```java
+public class Order extends Model {
+    public ArrayList<Product> products() throws ModelException{
+        return this.manyToMany(Product.class, ProductOrder.class);
+    }
+}
+```
+[More details](https://wassimkallel.github.io/DopsieORM/Core/ORM/RelationalModel.html#manyToMany-java.lang.Class-java.lang.Class-java.lang.String-java.lang.String-)
+
 
 ## Go Further
 ### Custom table name
@@ -135,7 +192,7 @@ For Updates you should provide the SQL statment along to arguments:
 
 ```java
 ArrayList args = new ArrayList(Arrays.asList("Mike", 1));
-sqlUpdate("UPDATE users SET prenom = ? WHERE id = ?", args)
+sqlUpdate("UPDATE users SET last_name = ? WHERE id = ?", args)
 ```
 
 
