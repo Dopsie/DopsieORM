@@ -1,4 +1,4 @@
-package Core.ORM;
+package dopsie.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.lang.Class;
 import java.lang.reflect.*;
-import Helpers.Exceptions.*;
-import Models.*;
+import dopsie.exceptions.*;
 import java.util.Map;
 
 /**

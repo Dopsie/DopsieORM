@@ -1,4 +1,4 @@
-package Core.ORM;
+package dopsie.core;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
 import java.util.HashMap;
-import Helpers.Exceptions.*;
+import dopsie.exceptions.*;
 
 /**
  * Relational Model

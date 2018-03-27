@@ -1,9 +1,9 @@
-package Core.ORM;
+package dopsie.core;
 
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Connection;
-import Config.*;
+import config.*;
 /**
  * DataBaseManager
  */
