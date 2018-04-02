@@ -1,6 +1,6 @@
-package Models;
+package examples;
 import java.util.ArrayList;
-import Core.ORM.*;
+import dopsie.core.*;
 
 /**
  * Posts

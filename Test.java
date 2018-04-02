@@ -1,9 +1,9 @@
-import Core.ORM.*;
-import Models.*;
+import dopsie.core.*;
+import examples.*;
 import java.util.ArrayList;
 import java.sql.ResultSet;
 import java.util.*;
-import Core.DataTypes.*;
+import dopsie.dataTypes.*;
 
 /**
  * Test
@@ -13,7 +13,12 @@ public class Test {
     public static void main(String[] args) {
         try {
             
-            // Model.fetch(User.class).all().where("hey", "hi", "arg2").where("arg1", "operator", "arg2").execute();
+            ArrayList<User> x = Model.fetch(User.class).all()
+                    .where("prenom", "=", "wassim")
+                    .orderBy("prenom", "DESC")
+                    .orderBy("nom", "ASC")
+                    .execute();
+            System.out.println(x);
             // User user = new User();
             // user.setAttr("nom", "Kallel");
             // user.setAttr("prenom", "Wassim");

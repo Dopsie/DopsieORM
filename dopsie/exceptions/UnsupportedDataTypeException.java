@@ -1,5 +1,5 @@
+package dopsie.exceptions;
 
-package Helpers.Exceptions;
 /**
  * ModelException
  */

@@ -1,4 +1,4 @@
-package Core.DataTypes;
+package dopsie.dataTypes;
 
 /**
  * Date
