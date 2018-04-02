@@ -4,10 +4,28 @@ Lightweight ORM for Java / SQL developers.
 
 ## Getting started
 
-First, you should define SQL credentials found in the file: 
+First, you should download the latest version from [here](https://github.com/WassimKallel/DopsieORM/releases).
 
-```
-cp Config/Defines.java.sample Config/Defines.java
+Then, you can add the jar file to you project for example if you're using Netbeans, you should go to the Project Tree, Right click on Libraries, and choose the 'Add Jar/Folder' option, then select the path to the downloaded jar file.
+
+Before start using the ORM you should provide credentials:
+
+```java
+public class TestingDopsieORM {
+
+    public static void main(String[] args) {
+        System.setProperty("host", "localhost");
+        System.setProperty("port", "3306");
+        System.setProperty("database", "esprit");
+        System.setProperty("user", "root");
+        System.setProperty("password", "root");
+        
+        // You can use Models here.
+       
+    }
+    
+}
+
 ```
 
 ## Usage
