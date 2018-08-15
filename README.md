@@ -1,3 +1,5 @@
+![Dopsie](https://circleci.com/gh/Dopsie/DopsieORM/tree/master.svg?style=shield&circle-token=:circle-token)
+
 ![Dopsie](https://i.imgur.com/6BTvfLq.png)
 
 Lightweight ORM for Java / SQL developers.
