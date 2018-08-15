@@ -38,7 +38,7 @@ public abstract class RelationalModel {
      * Delete an entry.
      * Instance method that deletes an entry by its primaryKey.  
      */
-    public void delete() {
+    public void delete() throws ModelException {
         try {
             String queryStatement = "Delete From " + this.getTableName() + " WHERE " + this.getPrimaryKeyName()
                     + " = ? ;";
@@ -46,7 +46,7 @@ public abstract class RelationalModel {
             args.add(this.attributes.get(this.getPrimaryKeyName()));
             sqlUpdate(queryStatement, args);
         } catch (Exception e) {
-            System.out.println("Error deleting entry");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -55,7 +55,7 @@ public abstract class RelationalModel {
      * @param  query the sql query string, to be executed.  
      * @return      java.sql.ResultSet : the result of the executeQuery function
      */
-    public static ResultSet sqlQuery(String query) throws UnsupportedDataTypeException {
+    public static ResultSet sqlQuery(String query) throws UnsupportedDataTypeException, ModelException {
         return sqlQuery(query, new ArrayList<>());
     }
 
@@ -65,7 +65,7 @@ public abstract class RelationalModel {
      * @param  args the List of args to be binded with the query before execution.  
      * @return      java.sql.ResultSet : the result of the executeQuery function
      */
-    public static ResultSet sqlQuery(String query, List args) throws UnsupportedDataTypeException {
+    public static ResultSet sqlQuery(String query, List args) throws UnsupportedDataTypeException, ModelException {
         ResultSet result = null;
         try {
             Connection cnx = DataBaseManager.getInstance().getConnection();
@@ -73,7 +73,7 @@ public abstract class RelationalModel {
             statement = setPerparedStatementArgs(statement, args);
             result = statement.executeQuery();
         } catch (SQLException e) {
-            System.out.println("Error Executing query");
+            throw new ModelException(e.getMessage());
         }
         return result;
     }
@@ -110,14 +110,13 @@ public abstract class RelationalModel {
             // Loop through results
             while (data.next()) {
                 T object = model.newInstance();
+                object.isNew = false;
                 // loop through all cells using column details
                 fillModel(data, columns, object);
                 result.add(object);
             }
-        } catch (UnsupportedDataTypeException e) {
-            throw new UnsupportedDataTypeException("UnsupportedDataTypeException");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
         return result;
     }
@@ -127,13 +126,13 @@ public abstract class RelationalModel {
      *                  metadata of the last execution.
      * @return an Object containing the primarykey value if exist else null.
      */
-    public static Object getPrimaryKeyAfterInsert(PreparedStatement statement) throws SQLException {
+    public static int getPrimaryKeyAfterInsert(PreparedStatement statement) throws SQLException {
 
         ResultSet generatedKeys = statement.getGeneratedKeys();
         if (generatedKeys.next()) {
-            return generatedKeys.getLong(1);
+            return generatedKeys.getInt(1);
         }
-        return null;
+        return 0;
     }
     
     /**
@@ -142,22 +141,23 @@ public abstract class RelationalModel {
      *               fields that are going to be replaced as question mark (?).
      * @param args: the list of values that will be binded to the sql query in order
      *              to be prepared.
-     * @return Long: The value of the primarykey of the updated or newly 
+     * @return int: The value of the primarykey of the updated or newly 
      *              inserted entry.
      */
-    public static Long sqlUpdate(String query, List args) throws UnsupportedDataTypeException {
-
-        Long createdPrimaryKey = null;
+    public static int sqlUpdate(String query, List args) throws UnsupportedDataTypeException, ModelException{
+        System.out.println("Query " + query);
+        System.out.println("Args " + args);
+        int createdPrimaryKey = 0;
         try {
             Connection cnx = DataBaseManager.getInstance().getConnection();
             PreparedStatement statement = cnx.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS);
             statement = setPerparedStatementArgs(statement, args);
             statement.executeUpdate();
-            if (getPrimaryKeyAfterInsert(statement) != null) {
-                createdPrimaryKey = (Long) getPrimaryKeyAfterInsert(statement);
+            if (getPrimaryKeyAfterInsert(statement) != 0) {
+                createdPrimaryKey = getPrimaryKeyAfterInsert(statement);
             }
         } catch (SQLException e) {
-            System.out.println("Error Executing query");
+            throw new ModelException(e.getMessage());
         }
         return createdPrimaryKey;
     }
@@ -176,9 +176,9 @@ public abstract class RelationalModel {
      *      creates an new entry if the instance is newly created and never saved before.
      *      updates the entry that matches the primarykey of the instance if modified.
      */
-    public void save() {
+    public void save() throws ModelException, UnsupportedDataTypeException{
         if (this.isNew()) {
-            Long primaryKey = this.insert();
+            int primaryKey = this.insert();
             this.setPrimaryKeyAfterInsert(primaryKey);
             this.isNew = false;
         } else {
@@ -192,8 +192,8 @@ public abstract class RelationalModel {
      * newly created instance will have usually an new primarykey
      * after insertion to database if not specified before.
      */
-    private void setPrimaryKeyAfterInsert(Long primaryKey) {
-        if (primaryKey != null) {
+    private void setPrimaryKeyAfterInsert(int primaryKey) {
+        if (primaryKey != 0) {
             this.setAttr(this.getPrimaryKeyName(), primaryKey);
         }
     }
@@ -213,7 +213,7 @@ public abstract class RelationalModel {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
             return Model.fetch(theClass).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute();
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -229,7 +229,7 @@ public abstract class RelationalModel {
         try {
             return hasMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -245,7 +245,7 @@ public abstract class RelationalModel {
         try {
             return this.hasOne(theClass, theClass.getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -261,7 +261,7 @@ public abstract class RelationalModel {
         try {
             return Model.find(theClass, (int) this.getAttr(foreignKey));
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -277,7 +277,7 @@ public abstract class RelationalModel {
         try {
             return belongsTo(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -295,7 +295,7 @@ public abstract class RelationalModel {
             return theClass.cast(
                     Model.fetch(theClass).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute().get(0));
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -311,7 +311,7 @@ public abstract class RelationalModel {
         try {
             return belongsToMany(theClass, this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -328,7 +328,7 @@ public abstract class RelationalModel {
             int primaryKey = (int) this.getAttr(this.getPrimaryKeyName());
             return Model.fetch(theClass).all().where(foreignKey, "=", Integer.toString(primaryKey)).execute();
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -353,7 +353,7 @@ public abstract class RelationalModel {
             }
             return result;
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -373,7 +373,7 @@ public abstract class RelationalModel {
             return manyToMany(theClass, pivotModel, foreignKeyFromOtherClass,
                     this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -394,10 +394,10 @@ public abstract class RelationalModel {
                     this.getClass().getSimpleName().toLowerCase() + "_id");
         } catch (Exception e) {
 
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
-
+    
     /**
      * From a Resultset (result of query execution)  and the names of the columns/types 
      *  populate the fields of Model instance
@@ -414,10 +414,11 @@ public abstract class RelationalModel {
             String value = (String) cell.getValue();
             if (value == "TEXT" || value == "VARCHAR") {
                 object.setAttr(key, data.getString(key));
+            } else if (value == "BIGINT") {
+                object.setAttr(key, data.getLong(key));
             } else if (value == "DATE" || value == "DATETIME") {
                 object.setAttr(key, data.getDate(key));
-            } else if (value == "INT" || value == "TINYINT" || value == "SMALLINT" || value == "MEDIUMINT"
-                    || value == "BIGINT") {
+            } else if (value == "INT" || value == "TINYINT" || value == "SMALLINT" || value == "MEDIUMINT") {
                 object.setAttr(key, data.getInt(key));
             } else if (value == "FLOAT") {
                 object.setAttr(key, data.getFloat(key));
@@ -431,27 +432,27 @@ public abstract class RelationalModel {
     /**
      * Update an entry in the database from a new modified instance of a model.
      */
-    private void update() {
-        try {
-            String columnsNames = String.join(",", this.attributes.keySet());
-            ArrayList<String> args = new ArrayList<String>();
-            for (Map.Entry<String, Object> attr : this.attributes.entrySet()) {
-                args.add(" " + attr.getKey() + " = ?");
-            }
-            String queryString = "UPDATE " + this.getTableName() + " SET " + String.join(",", args) + " WHERE "
-                    + this.getPrimaryKeyName() + " = " + this.getAttr(this.getPrimaryKeyName());
-            this.attributes.values().forEach(System.out::println);
-            sqlUpdate(queryString, new ArrayList(this.attributes.values()));
-        } catch (Exception e) {
-            System.out.println("Error updating model");
+    private void update() throws UnsupportedDataTypeException,ModelException{
+        ArrayList<String> args = new ArrayList<String>();
+        for (Map.Entry<String, Object> attr : this.attributes.entrySet()) {
+            args.add(" " + attr.getKey() + " = ?");
         }
+        String queryString = "UPDATE " + this.getTableName() + " SET " + String.join(",", args) + " WHERE "
+                + this.getPrimaryKeyName() + " = " + this.getAttr(this.getPrimaryKeyName());
+        for(Map.Entry e: this.attributes.entrySet()) {
+            if(e.getValue() == null) {
+                e.setValue("NULL");
+            }
+        }
+        this.attributes.values().forEach(System.out::println);
+        sqlUpdate(queryString, new ArrayList(this.attributes.values()));
     }
     /**
      * Insert newly created entry in the database from a new instance of a model.
      * @return The primaryKey of the newly added entry.
      */
-    private Long insert() {
-        Long result = null;
+    private int insert() {
+        int result = 0;
         try {
             String columnsNames = String.join(",", this.attributes.keySet());
             String[] wildcards = new String[this.attributes.size()];
@@ -463,6 +464,7 @@ public abstract class RelationalModel {
             result = sqlUpdate(queryString, new ArrayList(this.attributes.values()));
         } catch (Exception e) {
             System.out.println("Error inserting new entry");
+            System.out.println(e.getMessage());
         }
         return result;
     }

@@ -21,7 +21,7 @@ public class DataBaseManager {
             url =  "jdbc:mysql://" + host + ":"+ port +"/" + database ;
             cnx = DriverManager.getConnection(url, user, password);
         }catch (SQLException ex) {
-            System.out.println("Error connecting to Database");
+            System.out.println("Error connecting to Database : " + ex.getMessage());
         }
     }
     public static DataBaseManager getInstance () {

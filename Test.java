@@ -12,6 +12,12 @@ public class Test {
 
     public static void main(String[] args) {
         try {
+            System.setProperty("host", "localhost");
+            System.setProperty("port", "3306");
+            System.setProperty("database", "esprit");
+            System.setProperty("user", "root");
+            System.setProperty("password", "root");
+
             
             ArrayList<User> x = Model.fetch(User.class).all()
                     .where("prenom", "=", "wassim")

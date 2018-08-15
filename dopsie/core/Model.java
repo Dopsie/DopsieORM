@@ -95,7 +95,7 @@ public class Model extends RelationalModel {
         try {
             return theClass.cast(theClass.newInstance());
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
     /**
@@ -117,7 +117,7 @@ public class Model extends RelationalModel {
             return theClass.cast(Model.fetch(theClass).all()
                     .where(object.getPrimaryKeyName(), "=", Integer.toString(id)).execute().get(0));
         } catch (Exception e) {
-            throw new ModelException("Couldn't create Model");
+            throw new ModelException(e.getMessage());
         }
     }
 
@@ -148,6 +148,7 @@ public class Model extends RelationalModel {
             query += String.join(",", orderStatments);
         }
         query += ";";
+        this.isNew = false;
         return sqlQuery(query, args, this.getClass());
     }
 
