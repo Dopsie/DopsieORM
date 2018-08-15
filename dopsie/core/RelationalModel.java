@@ -168,7 +168,7 @@ public abstract class RelationalModel {
      *          default: return simple class name.
      */
     public String getTableName() {
-        return this.getClass().getSimpleName().toLowerCase();
+        return "`" + this.getClass().getSimpleName().toLowerCase() + "`";
     }
 
     /**
